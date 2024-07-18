@@ -1,35 +1,23 @@
-import { Box, Button, Container, Typography } from "@mui/material";
 import MainLayout from "./components/MainLayout";
 import { useState } from "react";
 import SignIn from "./components/SignIn";
+import Cookies from "universal-cookie";
+import Room from "./components/Room";
+import Chat from "./components/Chat";
+
+const cookies = new Cookies();
 
 function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(cookies.get("user"));
+  const [roomId, setRoomId] = useState<string | null>(null);
   return (
-    <Box sx={{ bgcolor: "#d0f4de", maxHeight: "100vh", minHeight: "100vh" }}>
-      <Container
-        sx={{
-          border: "0.5rem solid #a9def9",
-          borderRadius: "2rem",
-          minHeight: "100vh",
-          display: "flex",
-          flexDirection: "column",
-        }}
-      >
-        <MainLayout isLoggedIn={isLoggedIn}>
-          {isLoggedIn ? (
-            <>
-              <Typography sx={{ fontSize: "2rem" }}>Logged In!</Typography>
-              <Button variant="contained" color="primary">
-                Click
-              </Button>
-            </>
-          ) : (
-            <SignIn />
-          )}
-        </MainLayout>
-      </Container>
-    </Box>
+    <MainLayout isLoggedIn={isLoggedIn} setLogIn={setIsLoggedIn}>
+      {isLoggedIn ? (
+        <>{roomId ? <Chat /> : <Room />}</>
+      ) : (
+        <SignIn setLogIn={setIsLoggedIn} />
+      )}
+    </MainLayout>
   );
 }
 

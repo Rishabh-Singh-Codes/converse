@@ -1,4 +1,3 @@
-import * as React from "react";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
@@ -10,11 +9,22 @@ import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
 import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
+import Cookies from "universal-cookie";
+import { signOut } from "firebase/auth";
+import { auth } from "../firebase-config";
+import { useState } from "react";
 
-const Navbar = ({ isLoggedIn = false }) => {
-  const [anchorElUser, setAnchorElUser] = React.useState(null);
+const cookies = new Cookies();
 
-  const handleOpenUserMenu = (event: any) => {
+type Props = {
+    isLoggedIn: boolean;
+    setLogIn: (val: boolean) => void;
+}
+
+const Navbar = ({ isLoggedIn = false, setLogIn }: Props) => {
+  const [anchorElUser, setAnchorElUser] = useState<HTMLElement | null>(null);
+
+  const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorElUser(event.currentTarget);
   };
 
@@ -22,9 +32,18 @@ const Navbar = ({ isLoggedIn = false }) => {
     setAnchorElUser(null);
   };
 
+  const user = cookies.get("user");
+
+  const handleLogOut = async () => {
+    await signOut(auth);
+    cookies.remove("user");
+    handleCloseUserMenu();
+    setLogIn(false);
+  }
+
   return (
     <AppBar position="static" sx={{ borderRadius: "1rem", marginTop: "1rem" }}>
-      <Container sx={{ minWidth: "90%" }}>
+      <Container sx={{ minWidth: "95%" }}>
         <Toolbar disableGutters>
           <Typography
             variant="h6"
@@ -47,7 +66,7 @@ const Navbar = ({ isLoggedIn = false }) => {
             {isLoggedIn ? (
               <Tooltip title="Open settings">
                 <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                  <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
+                  <Avatar alt={user.displayName} src={user.photoURL} />
                 </IconButton>
               </Tooltip>
             ) : (
@@ -71,7 +90,7 @@ const Navbar = ({ isLoggedIn = false }) => {
               open={Boolean(anchorElUser)}
               onClose={handleCloseUserMenu}
             >
-              <MenuItem onClick={() => console.log("first")}>
+              <MenuItem onClick={handleLogOut}>
                 <Typography textAlign="center">Log Out</Typography>
               </MenuItem>
             </Menu>

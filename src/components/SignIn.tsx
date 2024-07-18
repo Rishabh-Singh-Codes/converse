@@ -1,7 +1,25 @@
 import { Box, Button, Typography } from "@mui/material";
-import { FaGoogle } from "react-icons/fa6";
+import GoogleIcon from '@mui/icons-material/Google';
+import { auth, provider } from "../firebase-config";
+import { signInWithPopup } from "firebase/auth";
+import Cookies from "universal-cookie";
 
-const SignIn = () => {
+const cookies = new Cookies();
+
+type Props = {
+    setLogIn: (val: boolean) => void;
+}
+
+const SignIn = ({setLogIn}: Props) => {
+  const handleGoogleSignIn = async () => {
+    try {
+      const { user } = await signInWithPopup(auth, provider);
+      cookies.set("user", JSON.stringify(user));
+      setLogIn(true);
+    } catch (error) {
+      console.log("error while signing in", error);
+    }
+  };
 
   return (
     <Box
@@ -24,10 +42,11 @@ const SignIn = () => {
         Sign In to join coversation
       </Typography>
       <Button
+        onClick={handleGoogleSignIn}
         variant="contained"
         sx={{ mt: "1rem", fontSize: "1.2rem" }}
       >
-        <FaGoogle style={{ fontSize: "1.5rem", marginRight: "1rem" }} />
+        <GoogleIcon style={{ fontSize: "1.5rem", marginRight: "1rem" }} />
         Sign In with Google
       </Button>
     </Box>
