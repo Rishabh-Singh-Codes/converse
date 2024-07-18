@@ -1,27 +1,49 @@
 import { createTheme } from "@mui/material";
 
 const theme = createTheme({
-    palette: {
-        primary: {
-            main: "#ff99c8",
-            contrastText: "#003566"
+  palette: {
+    primary: {
+      main: "#e4c1f9",
+      contrastText: "#003566",
+    },
+    secondary: {
+      main: "#fcf6bd",
+    },
+  },
+  components: {
+    MuiButton: {
+      styleOverrides: {
+        root: {
+          textTransform: "none",
         },
-        secondary: {
-            main: "#e4c1f9",
-        }
+      },
     },
-    components: {
-        MuiButton: {
-            styleOverrides: {
-                root: {
-                    textTransform: "none"
-                }
-            }
-        }
+    MuiContainer: {
+      styleOverrides: {
+        root: {
+          "@media (min-width: 0px)": {
+            width: "100%",
+          },
+          "@media (min-width: 600px)": {
+            width: "100%",
+          },
+          "@media (min-width: 960px)": {
+            width: "50%",
+          },
+        },
+      },
     },
-    typography: {
-        fontFamily: 'Mukta, Arial, sans-serif',
-    },
-})
+    MuiCssBaseline: {
+        styleOverrides: {
+          body: {
+            fontFamily: "Mukta, Arial, sans-serif",
+          },
+        },
+      },
+  },
+  typography: {
+    fontFamily: "Mukta, Arial, sans-serif",
+  },
+});
 
 export default theme;
