@@ -34,12 +34,19 @@ const theme = createTheme({
       },
     },
     MuiCssBaseline: {
-        styleOverrides: {
-          body: {
-            fontFamily: "Mukta, Arial, sans-serif",
-          },
+      styleOverrides: {
+        body: {
+          fontFamily: "Mukta, Arial, sans-serif",
         },
       },
+    },
+    MuiOutlinedInput: {
+      styleOverrides: {
+        input: {
+          padding: "8px 14px",
+        },
+      },
+    },
   },
   typography: {
     fontFamily: "Mukta, Arial, sans-serif",

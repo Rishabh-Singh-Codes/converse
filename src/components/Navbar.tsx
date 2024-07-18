@@ -39,17 +39,16 @@ const Navbar = ({ isLoggedIn = false, setLogIn }: Props) => {
     cookies.remove("user");
     handleCloseUserMenu();
     setLogIn(false);
+    localStorage.removeItem("roomId");
   }
 
   return (
     <AppBar position="static" sx={{ borderRadius: "1rem", marginTop: "1rem" }}>
-      <Container sx={{ minWidth: "95%" }}>
+      <Container sx={{ minWidth: "100%" }}>
         <Toolbar disableGutters>
           <Typography
             variant="h6"
             noWrap
-            component="a"
-            href="/"
             sx={{
               fontWeight: 900,
               fontSize: "2rem",
@@ -64,9 +63,9 @@ const Navbar = ({ isLoggedIn = false, setLogIn }: Props) => {
 
           <Box sx={{ flexGrow: 0 }}>
             {isLoggedIn ? (
-              <Tooltip title="Open settings">
+              <Tooltip title={user?.displayName}>
                 <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                  <Avatar alt={user.displayName} src={user.photoURL} />
+                  <Avatar alt={user?.displayName} src={user?.photoURL} />
                 </IconButton>
               </Tooltip>
             ) : (
