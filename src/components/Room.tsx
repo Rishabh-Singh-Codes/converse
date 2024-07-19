@@ -30,9 +30,10 @@ const Room = ({ setRoomDetails }: Props) => {
 
   if (!user) return;
 
-  const handleSubmitRoomId = (id: string) => {
+  const handleSubmitRoomId = (id: string, isAdmin: boolean) => {
     if (id.length) {
       setRoomDetails(id);
+      localStorage.setItem("isAdmin", isAdmin.toString());
     }
   };
 
@@ -50,10 +51,14 @@ const Room = ({ setRoomDetails }: Props) => {
           <Tooltip title="Copy Room Id">
             <ContentCopyIcon
               sx={{ ":hover": { cursor: "pointer" }, marginRight: "1rem" }}
+              onClick={() => navigator.clipboard.writeText(currRoomId)}
             />
           </Tooltip>
           <Tooltip title="Copy Link">
-            <LinkIcon sx={{ ":hover": { cursor: "pointer" } }} />
+            <LinkIcon
+              sx={{ ":hover": { cursor: "pointer" } }}
+              onClick={() => navigator.clipboard.writeText(currRoomId)}
+            />
           </Tooltip>
         </Box>
       </Box>
@@ -62,7 +67,7 @@ const Room = ({ setRoomDetails }: Props) => {
         variant="contained"
         endIcon={<TelegramIcon />}
         sx={{ mt: "1rem" }}
-        onClick={() => handleSubmitRoomId(currRoomId)}
+        onClick={() => handleSubmitRoomId(currRoomId, true)}
       >
         Enter Room
       </Button>
@@ -75,9 +80,7 @@ const Room = ({ setRoomDetails }: Props) => {
             value={userEnteredRoomId}
             onChange={(e) => setUserEnteredRoomId(e.target.value)}
           />
-          <IconButton
-            onClick={() => handleSubmitRoomId(userEnteredRoomId)}
-          >
+          <IconButton onClick={() => handleSubmitRoomId(userEnteredRoomId, false)}>
             <TelegramIcon sx={{ color: "primary.contrastText" }} />
           </IconButton>
         </Box>

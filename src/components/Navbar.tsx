@@ -6,13 +6,15 @@ import Typography from "@mui/material/Typography";
 import Menu from "@mui/material/Menu";
 import Container from "@mui/material/Container";
 import Avatar from "@mui/material/Avatar";
-import Button from "@mui/material/Button";
 import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
 import Cookies from "universal-cookie";
 import { signOut } from "firebase/auth";
-import { auth } from "../firebase-config";
+import { auth } from "../utils/firebase-config";
 import { useState } from "react";
+import ContentCopyIcon from "@mui/icons-material/ContentCopy";
+import LinkIcon from "@mui/icons-material/Link";
+import ForumIcon from '@mui/icons-material/Forum';
 
 const cookies = new Cookies();
 
@@ -33,6 +35,7 @@ const Navbar = ({ isLoggedIn = false, setLogIn }: Props) => {
   };
 
   const user = cookies.get("user");
+  const roomId = localStorage.getItem("roomId");
 
   const handleLogOut = async () => {
     await signOut(auth);
@@ -69,9 +72,9 @@ const Navbar = ({ isLoggedIn = false, setLogIn }: Props) => {
                 </IconButton>
               </Tooltip>
             ) : (
-              <Button variant="text" color="inherit">
-                Sign In
-              </Button>
+              <Box sx={{display: "flex", alignItems: "center"}}>
+                <ForumIcon sx={{marginY: "auto"}} />
+              </Box>
             )}
             <Menu
               sx={{ mt: "45px" }}
@@ -95,6 +98,24 @@ const Navbar = ({ isLoggedIn = false, setLogIn }: Props) => {
             </Menu>
           </Box>
         </Toolbar>
+
+       {roomId && <Box sx={{display: "flex", justifyContent: "space-between", my: "0.5rem"}}>
+          <Typography>Room: <span style={{fontWeight: "bolder"}}>{roomId}</span></Typography>
+          <Box sx={{ display: "flex", alignItems: "center", ml: "2rem" }}>
+          <Tooltip title="Copy Room Id">
+            <ContentCopyIcon
+              sx={{ ":hover": { cursor: "pointer" }, marginRight: "1rem" }}
+              onClick={() => navigator.clipboard.writeText(roomId)}
+            />
+          </Tooltip>
+          <Tooltip title="Copy Link">
+            <LinkIcon
+              sx={{ ":hover": { cursor: "pointer" } }}
+              onClick={() => navigator.clipboard.writeText(roomId)}
+            />
+          </Tooltip>
+        </Box>
+        </Box>}
       </Container>
     </AppBar>
   );
