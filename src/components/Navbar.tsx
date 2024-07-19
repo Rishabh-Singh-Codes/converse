@@ -58,6 +58,16 @@ const Navbar = ({ isLoggedIn = false, setLogIn }: Props) => {
     });
   }
 
+  const shareableLink = `${window.location.origin}/?roomId=${roomId}`;
+
+  const copyToClipboard = (text: string, type?: string) => {
+    navigator.clipboard.writeText(text);
+    enqueueSnackbar(`${type === "link" ? "Link copied" : "RoomId Copied"}`, {
+      variant: "info",
+      anchorOrigin: { horizontal: "right", vertical: "top" },
+    });
+  };
+
   return (
     <AppBar position="static" sx={{ borderRadius: "1rem", marginTop: "1rem" }}>
       <Container sx={{ minWidth: "100%" }}>
@@ -118,13 +128,13 @@ const Navbar = ({ isLoggedIn = false, setLogIn }: Props) => {
           <Tooltip title="Copy Room Id">
             <ContentCopyIcon
               sx={{ ":hover": { cursor: "pointer" }, marginRight: "1rem" }}
-              onClick={() => navigator.clipboard.writeText(roomId)}
+              onClick={() => copyToClipboard(roomId)}
             />
           </Tooltip>
           <Tooltip title="Copy Link">
             <LinkIcon
               sx={{ ":hover": { cursor: "pointer" } }}
-              onClick={() => navigator.clipboard.writeText(roomId)}
+              onClick={() => copyToClipboard(shareableLink, "link")}
             />
           </Tooltip>
         </Box>

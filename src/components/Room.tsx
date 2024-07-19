@@ -3,11 +3,8 @@ import {
   Button,
   IconButton,
   TextField,
-  Tooltip,
   Typography,
 } from "@mui/material";
-import ContentCopyIcon from "@mui/icons-material/ContentCopy";
-import LinkIcon from "@mui/icons-material/Link";
 import TelegramIcon from "@mui/icons-material/Telegram";
 import Cookies from "universal-cookie";
 import { useEffect, useState } from "react";
@@ -35,7 +32,6 @@ const Room = ({ setRoomDetails }: Props) => {
 
   const handleSubmitRoomId = async (id: string, isAdmin: boolean) => {
     if (id.length) {
-
       if (isAdmin) {
         await setDoc(
           doc(db, "rooms", id),
@@ -56,7 +52,7 @@ const Room = ({ setRoomDetails }: Props) => {
       } else {
         const roomDoc = await getDoc(doc(db, "rooms", id));
 
-        if(roomDoc.exists()) {
+        if (roomDoc.exists()) {
           setRoomDetails(id, isAdmin);
 
           enqueueSnackbar("Welcome to the room", {
@@ -80,24 +76,6 @@ const Room = ({ setRoomDetails }: Props) => {
         ready to enter your chat room?
       </Typography>
 
-      <Box sx={{ display: "flex", alignItems: "center", mt: "0.3rem" }}>
-        <span>Room Id:&nbsp;</span>
-        <span>{currRoomId}</span>
-        <Box sx={{ display: "flex", alignItems: "center", ml: "2rem" }}>
-          <Tooltip title="Copy Room Id">
-            <ContentCopyIcon
-              sx={{ ":hover": { cursor: "pointer" }, marginRight: "1rem" }}
-              onClick={() => navigator.clipboard.writeText(currRoomId)}
-            />
-          </Tooltip>
-          <Tooltip title="Copy Link">
-            <LinkIcon
-              sx={{ ":hover": { cursor: "pointer" } }}
-              onClick={() => navigator.clipboard.writeText(currRoomId)}
-            />
-          </Tooltip>
-        </Box>
-      </Box>
 
       <Button
         variant="contained"
@@ -105,7 +83,7 @@ const Room = ({ setRoomDetails }: Props) => {
         sx={{ mt: "1rem" }}
         onClick={() => handleSubmitRoomId(currRoomId, true)}
       >
-        Enter Room
+        Create Room
       </Button>
 
       <Box sx={{ mt: "7rem" }}>
