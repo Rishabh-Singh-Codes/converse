@@ -1,23 +1,32 @@
 import { Box, Button, Typography } from "@mui/material";
-import GoogleIcon from '@mui/icons-material/Google';
+import GoogleIcon from "@mui/icons-material/Google";
 import { auth, provider } from "../utils/firebase-config";
 import { signInWithPopup } from "firebase/auth";
 import Cookies from "universal-cookie";
+import { enqueueSnackbar } from "notistack";
 
 const cookies = new Cookies();
 
 type Props = {
-    setLogIn: (val: boolean) => void;
-}
+  setLogIn: (val: boolean) => void;
+};
 
-const SignIn = ({setLogIn}: Props) => {
+const SignIn = ({ setLogIn }: Props) => {
   const handleGoogleSignIn = async () => {
     try {
       const { user } = await signInWithPopup(auth, provider);
       cookies.set("user", JSON.stringify(user));
       setLogIn(true);
+      enqueueSnackbar("Login Successful", {
+        variant: "success",
+        anchorOrigin: { horizontal: "right", vertical: "top" },
+      });
     } catch (error) {
       console.log("error while signing in", error);
+      enqueueSnackbar("Error in login", {
+        variant: "error",
+        anchorOrigin: { horizontal: "right", vertical: "top" },
+      });
     }
   };
 

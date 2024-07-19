@@ -12,11 +12,14 @@ import TelegramIcon from "@mui/icons-material/Telegram";
 import Cookies from "universal-cookie";
 import { useEffect, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
+import { doc, getDoc, setDoc } from "firebase/firestore";
+import { db } from "../utils/firebase-config";
+import { enqueueSnackbar } from "notistack";
 
 const cookies = new Cookies();
 
 type Props = {
-  setRoomDetails: (val: string) => void;
+  setRoomDetails: (id: string, isAdmin: boolean) => void;
 };
 
 const Room = ({ setRoomDetails }: Props) => {
@@ -30,10 +33,43 @@ const Room = ({ setRoomDetails }: Props) => {
 
   if (!user) return;
 
-  const handleSubmitRoomId = (id: string, isAdmin: boolean) => {
+  const handleSubmitRoomId = async (id: string, isAdmin: boolean) => {
     if (id.length) {
-      setRoomDetails(id);
-      localStorage.setItem("isAdmin", isAdmin.toString());
+
+      if (isAdmin) {
+        await setDoc(
+          doc(db, "rooms", id),
+          {
+            admin: user.uid,
+            adminName: user.displayName,
+            isAdminOnline: true,
+          },
+          { merge: true }
+        );
+
+        setRoomDetails(id, isAdmin);
+
+        enqueueSnackbar("Welcome to the room", {
+          variant: "success",
+          anchorOrigin: { horizontal: "right", vertical: "top" },
+        });
+      } else {
+        const roomDoc = await getDoc(doc(db, "rooms", id));
+
+        if(roomDoc.exists()) {
+          setRoomDetails(id, isAdmin);
+
+          enqueueSnackbar("Welcome to the room", {
+            variant: "success",
+            anchorOrigin: { horizontal: "right", vertical: "top" },
+          });
+        } else {
+          enqueueSnackbar("Room not found", {
+            variant: "error",
+            anchorOrigin: { horizontal: "right", vertical: "top" },
+          });
+        }
+      }
     }
   };
 
@@ -80,7 +116,9 @@ const Room = ({ setRoomDetails }: Props) => {
             value={userEnteredRoomId}
             onChange={(e) => setUserEnteredRoomId(e.target.value)}
           />
-          <IconButton onClick={() => handleSubmitRoomId(userEnteredRoomId, false)}>
+          <IconButton
+            onClick={() => handleSubmitRoomId(userEnteredRoomId, false)}
+          >
             <TelegramIcon sx={{ color: "primary.contrastText" }} />
           </IconButton>
         </Box>

@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import {
   addDoc,
   collection,
+  doc,
   onSnapshot,
   orderBy,
   query,
@@ -13,7 +14,9 @@ import SendRoundedIcon from "@mui/icons-material/SendRounded";
 import { db } from "../utils/firebase-config";
 import Cookies from "universal-cookie";
 import { Message } from "../utils/types";
+import ForumIcon from "@mui/icons-material/Forum";
 import MessageBox from "./Message";
+import { enqueueSnackbar } from "notistack";
 
 const cookies = new Cookies();
 
@@ -23,11 +26,13 @@ const Chat = () => {
   const [newMessage, setNewMessage] = useState<string>("");
   const [messages, setMessages] = useState<Message[]>([]);
   const bottomRef = useRef<HTMLDivElement>(null);
+  const [isAdminOnline, setIsAdminOnline] = useState<boolean>(true);
 
   const user = cookies.get("user");
 
   const messagesCollection = collection(db, "messages");
 
+  //   For getting messages
   useEffect(() => {
     const queryMessages = query(
       messagesCollection,
@@ -60,9 +65,31 @@ const Chat = () => {
     return () => unsubscribe();
   }, [roomId]);
 
+  //   For scrolling to the bottom most message
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({behavior: "smooth"});
+    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
+
+  //   For checking if the room admin is oonline
+  useEffect(() => {
+    const roomRef = doc(db, "rooms", roomId);
+
+    const unsubscribe = onSnapshot(roomRef, (doc) => {
+      const data = doc.data();
+      const adminOnline = data?.isAdminOnline ?? true;
+
+      if (!adminOnline && !isAdmin) {
+        enqueueSnackbar("Admin left the room", {
+          variant: "error",
+          anchorOrigin: { horizontal: "right", vertical: "top" },
+        });
+      }
+
+      setIsAdminOnline(adminOnline);
+    });
+
+    return () => unsubscribe();
+  }, [roomId]);
 
   if (!roomId) return null;
 
@@ -104,18 +131,51 @@ const Chat = () => {
           height: "100%",
         }}
       >
-        {messages.map((message) => (
+        {!isAdminOnline && (
           <Box
-            key={message.id}
             sx={{
-              width: "100%",
-              display: "flex",
-              justifyContent: message.userId === user.uid ? "end" : "start",
+              minWidth: { xs: "88vw", md: "46vw" },
+              position: "fixed",
+              textAlign: "center",
+              bgcolor: "gray",
+              mx: "auto",
+              zIndex: "10",
+              py: "1rem",
+              borderRadius: "1rem",
+              color: "white",
+              fontWeight: "bolder",
             }}
           >
-            <MessageBox message={message} />
+            Admin left the room.
           </Box>
-        ))}
+        )}
+        {messages.length > 0 ? (
+          messages.map((message) => (
+            <Box
+              key={message.id}
+              sx={{
+                width: "100%",
+                display: "flex",
+                justifyContent: message.userId === user.uid ? "end" : "start",
+              }}
+            >
+              <MessageBox message={message} isAdminOnline={isAdminOnline} />
+            </Box>
+          ))
+        ) : (
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              width: "100%",
+              height: "100%",
+              color: "gray",
+            }}
+          >
+            <ForumIcon sx={{ mr: "1rem" }} /> No messages in this room yet.
+          </Box>
+        )}
         <Box ref={bottomRef} />
       </Box>
       <form onSubmit={sendMessage} style={{ display: "flex" }}>
@@ -124,12 +184,14 @@ const Chat = () => {
           placeholder="Type your message"
           value={newMessage}
           onChange={(e) => setNewMessage(e.target.value)}
+          disabled={!isAdminOnline}
         />
         <Button
           variant="contained"
           endIcon={<SendRoundedIcon />}
           sx={{ ml: "1rem" }}
           type="submit"
+          disabled={!isAdminOnline}
         >
           Send
         </Button>

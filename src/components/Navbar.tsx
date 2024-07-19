@@ -10,11 +10,13 @@ import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
 import Cookies from "universal-cookie";
 import { signOut } from "firebase/auth";
-import { auth } from "../utils/firebase-config";
+import { auth, db } from "../utils/firebase-config";
 import { useState } from "react";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import LinkIcon from "@mui/icons-material/Link";
 import ForumIcon from '@mui/icons-material/Forum';
+import { doc, updateDoc } from "firebase/firestore";
+import { enqueueSnackbar } from "notistack";
 
 const cookies = new Cookies();
 
@@ -36,13 +38,24 @@ const Navbar = ({ isLoggedIn = false, setLogIn }: Props) => {
 
   const user = cookies.get("user");
   const roomId = localStorage.getItem("roomId");
+  const isAdmin = localStorage.getItem("isAdmin");
 
   const handleLogOut = async () => {
     await signOut(auth);
+    if(isAdmin && roomId) {
+      await updateDoc(doc(db, "rooms", roomId), {
+        isAdminOnline: false,
+      });
+    }
     cookies.remove("user");
     handleCloseUserMenu();
     setLogIn(false);
     localStorage.removeItem("roomId");
+    localStorage.removeItem("isAdmin");
+    enqueueSnackbar("Logout Successful", {
+      variant: "success",
+      anchorOrigin: { horizontal: "right", vertical: "top" },
+    });
   }
 
   return (

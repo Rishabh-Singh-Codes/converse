@@ -5,13 +5,14 @@ import { format } from "date-fns";
 
 type Props = {
   message: Message;
+  isAdminOnline: boolean;
 };
 
-const MessageBox = ({ message }: Props) => {
+const MessageBox = ({ message, isAdminOnline }: Props) => {
   return (
     <Box
       sx={{
-        bgcolor: "#a9def9",
+        bgcolor: isAdminOnline ? "#a9def9" : "lightgray",
         width: "fit-content",
         maxWidth: "70%",
         padding: "0.5rem",
